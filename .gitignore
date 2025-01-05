@@ -3,3 +3,6 @@ data/challenge.db
 .DS_Store
 pipeline/test.ipynb
 pipeline/__pycache__/setup_db.cpython-39.pyc
+attribution_results.json
+path_to_your_database.sqlite
+pipeline/__pycache__/build_customer_journey.cpython-39.pyc

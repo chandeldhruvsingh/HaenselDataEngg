@@ -2,8 +2,9 @@ import sqlite3
 import pandas as pd
 import logging
 import os
-from typing import Optional, Dict, List
+from typing import Optional, Dict
 from datetime import datetime
+from setup_db import DatabaseSetup  # Import the DatabaseSetup class
 
 logging.basicConfig(
     level=logging.INFO,
@@ -12,14 +13,28 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 class CustomerJourneyBuilder:
-    def __init__(self, db_path: str):
+    def __init__(self, db_path: str, sql_path: str):
         """
         Initialize the Customer Journey Builder.
         
         Args:
             db_path: Path to SQLite database
+            sql_path: Path to SQL file for database setup
         """
         self.db_path = db_path
+        self.sql_path = sql_path
+        self._setup_database()
+
+    def _setup_database(self):
+        """
+        Ensure the database is set up before building journeys.
+        """
+        logger.info("Setting up the database if required...")
+        db_setup = DatabaseSetup(self.db_path, self.sql_path)
+        if not db_setup.setup_database():
+            logger.error("Database setup failed. Exiting.")
+            raise RuntimeError("Database setup failed.")
+        logger.info("Database setup completed successfully!")
 
     def get_connection(self) -> sqlite3.Connection:
         """Create database connection."""
@@ -148,9 +163,10 @@ def main():
     # Get the absolute path to the project root directory
     project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
     db_path = os.path.join(project_root, 'data', 'challenge.db')
+    sql_path = os.path.join(project_root, 'data', 'challenge_db_create.sql')
     
     # Initialize journey builder
-    journey_builder = CustomerJourneyBuilder(db_path)
+    journey_builder = CustomerJourneyBuilder(db_path, sql_path)
     
     try:
         # Build journeys
