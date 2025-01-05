@@ -2,6 +2,7 @@ import requests
 import pandas as pd
 import logging
 import json
+import os
 from typing import List, Dict, Optional
 import time
 from build_customer_journey import CustomerJourneyBuilder
@@ -98,7 +99,7 @@ class IHCAttributionClient:
         
         return formatted_journeys
 
-    def send_to_api(self, journeys: List[Dict], retry_count: int = 3, retry_delay: int = 5) -> Optional[Dict]:
+    def send_to_api(self, journeys: List[Dict], retry_count: int = 1, retry_delay: int = 5) -> Optional[Dict]:
         """
         Send journeys to API with retry logic and debugging.
         
@@ -163,13 +164,14 @@ class IHCAttributionClient:
                     logger.error(f"Request failed after {retry_count} attempts: {str(e)}")
                     return None
 
-    def process_journeys(self, df: pd.DataFrame) -> List[Dict]:
+    def process_journeys(self, df: pd.DataFrame, batch_size: int = 200) -> List[Dict]:
         """
-        Process journeys and send to API.
+        Process journeys in batches and send to API.
         
         Args:
             df: DataFrame containing journey data
-            
+            batch_size: Maximum number of journeys to process in each batch
+                
         Returns:
             List of API responses
         """
@@ -177,19 +179,33 @@ class IHCAttributionClient:
         
         # Format the journey data
         formatted_journeys = self.format_journey_data(df)
-        logger.info(f"Formatted {len(formatted_journeys)} journeys")
+        total_journeys = len(formatted_journeys)
+        logger.info(f"Formatted {total_journeys} journeys")
         
-        # Add debug logging
-        logger.debug(f"Sample journey data: {json.dumps(formatted_journeys[0] if formatted_journeys else {}, indent=2)}")
+        # Process in batches
+        responses = []
+        for i in range(0, total_journeys, batch_size):
+            batch = formatted_journeys[i:i + batch_size]
+            logger.info(f"Processing batch {i//batch_size + 1} with {len(batch)} journeys")
+            
+            # Add debug logging
+            if batch:
+                logger.debug(f"Sample journey data: {json.dumps(batch[0], indent=2)}")
+            
+            # Send batch to API
+            response = self.send_to_api(batch)
+            if response:
+                logger.info(f"Successfully received API response for batch {i//batch_size + 1}")
+                responses.append(response)
+            else:
+                logger.error(f"Failed to get API response for batch {i//batch_size + 1}")
         
-        # Send to API
-        response = self.send_to_api(formatted_journeys)
-        if response:
-            logger.info("Successfully received API response")
-            return [response]
+        if responses:
+            logger.info(f"Successfully processed {len(responses)} batches")
         else:
-            logger.error("Failed to get API response")
-            return []
+            logger.error("No batches were successfully processed")
+        
+        return responses
 
 def main():
     # Set debug logging
@@ -197,29 +213,32 @@ def main():
     
     # Your API key and conv_type_id
     api_key = "17e9cc65-2e46-4345-9210-36860a63f435"
-    conv_type_id = "data_engineering_challenge"  # or your specific conv_type_id
+    conv_type_id = "data_engineering_challenge"
     
-    # Path to the SQLite database
-    db_path = "path_to_your_database.sqlite"  # Replace with the actual path to your SQLite database
+    project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    
+    # Construct paths
+    db_path = os.path.join(project_root, 'data', 'challenge.db')
+    sql_path = os.path.join(project_root, 'data', 'challenge_db_create.sql')
     
     try:
         # Initialize the journey builder
-        journey_builder = CustomerJourneyBuilder(db_path)
+        journey_builder = CustomerJourneyBuilder(db_path, sql_path)
         
-        # Build customer journeys (you can specify start_date and end_date as needed)
+        # Build customer journeys
         journeys_df = journey_builder.build_journeys()
         
         # Initialize the IHC Attribution API client
         client = IHCAttributionClient(api_key, conv_type_id)
         
-        # Process and send the journeys to the API
-        responses = client.process_journeys(journeys_df)
+        # Process and send the journeys to the API in batches
+        responses = client.process_journeys(journeys_df, batch_size=200)
         
         # Save API responses to a file
         if responses:
             with open('attribution_results.json', 'w') as f:
                 json.dump(responses, f, indent=2)
-            logger.info("Successfully saved results")
+            logger.info(f"Successfully saved results from {len(responses)} batches")
         
     except Exception as e:
         logger.error(f"Error processing journeys: {str(e)}")
