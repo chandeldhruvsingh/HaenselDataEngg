@@ -1,3 +1,5 @@
 data/challenge_db_create.sql
 data/challenge.db
 .DS_Store
+pipeline/test.ipynb
+pipeline/__pycache__/setup_db.cpython-39.pyc
