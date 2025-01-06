@@ -1,6 +1,6 @@
 import pytest
 import pandas as pd
-from build_customer_journey import CustomerJourneyBuilder
+from pipeline.build_customer_journey import CustomerJourneyBuilder
 
 @pytest.fixture
 def sample_data(test_db_path):

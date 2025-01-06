@@ -1,6 +1,6 @@
 import pytest
 from unittest.mock import patch, Mock
-from send_to_api import IHCAttributionClient
+from pipeline.send_to_api import IHCAttributionClient
 
 @pytest.fixture
 def sample_journey_data():

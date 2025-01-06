@@ -3,8 +3,8 @@ import sqlite3
 import os
 from typing import List, Dict, Optional
 import logging
-from send_to_api import IHCAttributionClient
-from build_customer_journey import CustomerJourneyBuilder
+from pipeline.send_to_api import IHCAttributionClient
+from pipeline.build_customer_journey import CustomerJourneyBuilder
 
 
 logging.basicConfig(
