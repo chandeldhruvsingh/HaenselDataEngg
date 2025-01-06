@@ -1,13 +1,4 @@
-data/challenge_db_create.sql
 data/challenge.db
-.DS_Store
-pipeline/test.ipynb
-pipeline/__pycache__/setup_db.cpython-39.pyc
 attribution_results.json
-path_to_your_database.sqlite
-pipeline/__pycache__/build_customer_journey.cpython-39.pyc
-pipeline/__pycache__/send_to_api.cpython-39.pyc
 channel_reporting.csv
-airflow_attribution/data/challenge_db_create.sql
-airflow_attribution/data/challenge.db
-airflow_attribution/dags/__pycache__/attribution_pipeline_dag.cpython-312.pyc
+airflow/data/challenge.db
