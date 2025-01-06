@@ -2,7 +2,7 @@
 import pytest
 import os
 import sqlite3
-from setup_db import DatabaseSetup
+from pipeline.setup_db import DatabaseSetup
 
 @pytest.fixture
 def test_db_path(tmp_path):
