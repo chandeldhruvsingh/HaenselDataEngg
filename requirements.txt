@@ -1,0 +1,5 @@
+pandas
+requests
+pytest
+sqlite3
+logging
