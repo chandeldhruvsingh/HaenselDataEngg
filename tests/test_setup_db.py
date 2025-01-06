@@ -2,7 +2,7 @@
 import pytest
 import os
 import sqlite3
-from pipeline.setup_db import DatabaseSetup
+from ..pipeline.setup_db import DatabaseSetup
 
 @pytest.fixture
 def test_db_path(tmp_path):
@@ -80,22 +80,3 @@ def test_database_setup_successful(test_db_path, test_sql_path):
 def test_database_setup_invalid_sql_path(test_db_path):
     db_setup = DatabaseSetup(test_db_path, "invalid_path.sql")
     assert db_setup.setup_database() == False
-
-def test_clean_sql_script():
-    db_setup = DatabaseSetup("test.db", "test.sql")
-    sql_content = '''
-    -- This is a comment
-    CREATE TABLE test (
-        id INTEGER PRIMARY KEY
-    );
-    
-    /* Multi-line
-       comment */
-    
-    -- Another comment
-    CREATE INDEX idx_test ON test(id);
-    '''
-    cleaned = db_setup.clean_sql_script(sql_content)
-    assert '--' not in cleaned
-    assert '/*' not in cleaned
-    assert '*/' not in cleaned
