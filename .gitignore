@@ -8,3 +8,6 @@ path_to_your_database.sqlite
 pipeline/__pycache__/build_customer_journey.cpython-39.pyc
 pipeline/__pycache__/send_to_api.cpython-39.pyc
 channel_reporting.csv
+airflow_attribution/data/challenge_db_create.sql
+airflow_attribution/data/challenge.db
+airflow_attribution/dags/__pycache__/attribution_pipeline_dag.cpython-312.pyc
