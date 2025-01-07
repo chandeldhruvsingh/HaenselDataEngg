@@ -5,27 +5,27 @@ FROM python:3.9-slim
 WORKDIR /app
 
 # Create directories
-RUN mkdir -p /app/pipeline /app/data /app/output
+RUN mkdir -p /app/pipeline /app/data /app/output /app/venv /app/config
 
-# Install required packages
-RUN pip install pandas requests
+# Copy requirements.txt into the container
+COPY requirements.txt /app/
 
-# Copy Python scripts from pipeline directory
-COPY pipeline/setup_db.py /app/pipeline/
-COPY pipeline/build_customer_journey.py /app/pipeline/
-COPY pipeline/send_to_api.py /app/pipeline/
-COPY pipeline/attribution_processor.py /app/pipeline/
+# Install venv and create a virtual environment
+RUN python -m venv /app/venv
 
-# Copy data files
-COPY data/challenge_db_create.sql /app/data/
+# Activate the virtual environment and install dependencies
+RUN /app/venv/bin/pip install --upgrade pip && \
+    /app/venv/bin/pip install -r /app/requirements.txt
+
+# Copy the config directory
+COPY config /app/config/
+COPY pipeline/ /app/pipeline/
+COPY data/ /app/data/
 
 # Set environment variables
 ENV PYTHONUNBUFFERED=1
-ENV API_KEY=""
-ENV CONV_TYPE_ID="data_engineering_challenge"
-ENV OUTPUT_PATH="/app/output/channel_reporting.csv"
-ENV BATCH_SIZE=200
 ENV PYTHONPATH=/app
+ENV PATH="/app/venv/bin:$PATH"
 
 # Create volumes for persistent storage
 VOLUME /app/data
