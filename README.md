@@ -4,39 +4,7 @@
 This project implements a marketing attribution pipeline that processes customer journey data and calculates channel attribution using the IHC Attribution API. The pipeline handles data from raw session and conversion events through to final channel performance reporting.
 
 ## Project Structure
-```
-project_root/
-├── data/
-│   ├── challenge.db
-│   ├── challenge_db_create.sql
-├── output/
-│   └── channel_reporting.csv
-├── pipeline/
-│   ├── __init__.py
-│   ├── setup_db.py
-│   ├── build_customer_journey.py
-│   ├── send_to_api.py
-│   └── attribution_processor.py
-├── tests/
-│   ├── __init__.py
-│   ├── test_setup_db.py
-│   ├── test_build_customer_journey.py
-│   ├── test_send_to_api.py
-│   └── test_attribution_processor.py
-├── airflow/
-│   ├── docker-compose.yml
-│   ├── dags/
-│   │   └── attribution_pipeline_dag.py
-│   └── data/
-│       ├── challenge.db
-│       └── challenge_db_create.sql
-├── config/
-│   ├── config.yaml
-│   └── config.py
-├── requirements.txt
-├── Dockerfile
-└── Makefile
-```
+project_root/ ├── data/ │ ├── challenge.db │ ├── challenge_db_create.sql ├── output/ │ └── channel_reporting.csv ├── pipeline/ │ ├── init.py │ ├── setup_db.py │ ├── build_customer_journey.py │ ├── send_to_api.py │ └── attribution_processor.py ├── tests/ │ ├── init.py │ ├── test_setup_db.py │ ├── test_build_customer_journey.py │ ├── test_send_to_api.py │ └── test_attribution_processor.py ├── airflow/ │ ├── docker-compose.yml │ ├── dags/ │ │ └── attribution_pipeline_dag.py │ └── data/ │ ├── challenge.db │ └── challenge_db_create.sql ├── config/ │ ├── config.yaml │ └── config.py ├── requirements.txt ├── Dockerfile └── Makefile
 
 ## Installation
 
