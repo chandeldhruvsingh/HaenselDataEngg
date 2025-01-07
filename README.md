@@ -3,7 +3,9 @@
 ## Overview
 This project implements a marketing attribution pipeline that processes customer journey data and calculates channel attribution using the IHC Attribution API. The pipeline handles data from raw session and conversion events through to final channel performance reporting.
 
-     project_root/
+## Project Structure
+
+      root/
       ├── data/
       │   ├── challenge.db
       │   ├── challenge_db_create.sql
