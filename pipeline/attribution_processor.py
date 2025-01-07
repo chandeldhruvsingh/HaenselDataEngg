@@ -1,10 +1,11 @@
 import pandas as pd
 import sqlite3
 import os
-from typing import List, Dict, Optional
 import logging
 from pipeline.send_to_api import IHCAttributionClient
 from pipeline.build_customer_journey import CustomerJourneyBuilder
+from typing import List, Dict, Optional
+from config import config
 
 
 logging.basicConfig(
@@ -14,7 +15,7 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 class AttributionProcessor:
-    def __init__(self, db_path: str, api_key: str, conv_type_id: str = 'data_engineering_challenge'):
+    def __init__(self, db_path: str, api_key: str, conv_type_id: str, base_url: str):
         """
         Initialize the processor with database and API settings.
         
@@ -24,7 +25,7 @@ class AttributionProcessor:
             conv_type_id: Conversion type identifier
         """
         self.db_path = db_path
-        self.api_client = IHCAttributionClient(api_key, conv_type_id)
+        self.api_client = IHCAttributionClient(api_key, conv_type_id, base_url)
         
     def process_batch(self, batch_response: Dict):
         """
@@ -109,21 +110,19 @@ class AttributionProcessor:
             logger.info(f"Channel report exported to {output_path}")
 
 def main():
-    # Configuration
-    # Your API key and conv_type_id
-    api_key = "17e9cc65-2e46-4345-9210-36860a63f435"
-    
-    project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-    
-    # Construct paths
-    db_path = os.path.join(project_root, 'data', 'challenge.db')
-    sql_path = os.path.join(project_root, 'data', 'challenge_db_create.sql')
-    output_path = "channel_reporting.csv"
-    batch_size = 200
+    #loading config
+    api_key = config.api.api_key
+    conv_type_id = config.api.conv_type_id
+    base_url = config.api.base_url
+
+    db_path = config.database.db_path
+    sql_path = config.database.sql_path
+    output_path = config.output.file_path
+    batch_size = config.api.batch_size
     
     try:
         # Initialize processor
-        processor = AttributionProcessor(db_path, api_key)
+        processor = AttributionProcessor(db_path, api_key, conv_type_id, base_url)
         
         # Get journey data
         journey_builder = CustomerJourneyBuilder(db_path, sql_path)
@@ -142,7 +141,7 @@ def main():
             # Get attribution for batch
             response = processor.api_client.send_to_api(batch)
             if response:
-                # Process batch results immediately
+                # Process batch results 
                 processor.process_batch(response)
                 
             # Update channel reporting after each batch

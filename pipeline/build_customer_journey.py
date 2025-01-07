@@ -4,7 +4,8 @@ import logging
 import os
 from typing import Optional, Dict
 from datetime import datetime
-from setup_db import DatabaseSetup  # Import the DatabaseSetup class
+from setup_db import DatabaseSetup
+from config import config
 
 logging.basicConfig(
     level=logging.INFO,
@@ -130,11 +131,6 @@ class CustomerJourneyBuilder:
         if null_counts.any():
             logger.warning(f"Null values found:\n{null_counts[null_counts > 0]}")
             
-        # Verify engagement indicators are binary
-        for col in ['holder_engagement', 'closer_engagement', 'impression_interaction']:
-            invalid = ~df[col].isin([0, 1])
-            if invalid.any():
-                logger.warning(f"Invalid values in {col}: {df[col][invalid].unique()}")
 
     def get_journey_stats(self, df: pd.DataFrame) -> Dict:
         """
@@ -160,19 +156,17 @@ class CustomerJourneyBuilder:
         return stats
 
 def main():
-    # Get the absolute path to the project root directory
-    project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-    db_path = os.path.join(project_root, 'data', 'challenge.db')
-    sql_path = os.path.join(project_root, 'data', 'challenge_db_create.sql')
+
+    db_path = config.database.db_path
+    sql_path = config.database.sql_path
     
-    # Initialize journey builder
     journey_builder = CustomerJourneyBuilder(db_path, sql_path)
     
     try:
         # Build journeys
         journeys_df = journey_builder.build_journeys()
         
-        # Get and print statistics
+        # Print Stats
         stats = journey_builder.get_journey_stats(journeys_df)
         logger.info("\nJourney Statistics:")
         for key, value in stats.items():

@@ -1,5 +1,5 @@
-pandas
-requests
-pytest
+pandas==1.4.4
+requests==2.31.0
+pytest==7.1.2
 sqlite3
 logging

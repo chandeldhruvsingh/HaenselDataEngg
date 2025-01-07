@@ -3,9 +3,10 @@ import pandas as pd
 import logging
 import json
 import os
-from typing import List, Dict, Optional
 import time
 from build_customer_journey import CustomerJourneyBuilder
+from typing import List, Dict, Optional
+from config import config
 
 logging.basicConfig(
     level=logging.INFO,
@@ -14,17 +15,18 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 class IHCAttributionClient:
-    def __init__(self, api_key: str, conv_type_id: str = 'data_engineering_challenge'):
+    def __init__(self, api_key: str, conv_type_id: str, base_url: str):
         """
         Initialize the IHC Attribution API client.
         
         Args:
             api_key: API authentication key
             conv_type_id: Conversion type identifier
+            base_url: IHC API URL
         """
         self.api_key = api_key
         self.conv_type_id = conv_type_id
-        self.base_url = "https://api.ihc-attribution.com/v1/compute_ihc"
+        self.base_url = base_url
         self.headers = {
             "Content-Type": "application/json",
             "x-api-key": api_key
@@ -140,7 +142,7 @@ class IHCAttributionClient:
         for attempt in range(retry_count):
             try:
                 response = requests.post(
-                    self.api_url,  # Using the URL with query parameter
+                    self.api_url, 
                     headers=self.headers,
                     json=payload,
                     timeout=30
@@ -177,7 +179,6 @@ class IHCAttributionClient:
         """
         logger.info("Starting journey processing...")
         
-        # Format the journey data
         formatted_journeys = self.format_journey_data(df)
         total_journeys = len(formatted_journeys)
         logger.info(f"Formatted {total_journeys} journeys")
@@ -188,7 +189,6 @@ class IHCAttributionClient:
             batch = formatted_journeys[i:i + batch_size]
             logger.info(f"Processing batch {i//batch_size + 1} with {len(batch)} journeys")
             
-            # Add debug logging
             if batch:
                 logger.debug(f"Sample journey data: {json.dumps(batch[0], indent=2)}")
             
@@ -208,18 +208,15 @@ class IHCAttributionClient:
         return responses
 
 def main():
-    # Set debug logging
     logging.getLogger(__name__).setLevel(logging.DEBUG)
-    
-    # Your API key and conv_type_id
-    api_key = "17e9cc65-2e46-4345-9210-36860a63f435"
-    conv_type_id = "data_engineering_challenge"
-    
-    project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-    
-    # Construct paths
-    db_path = os.path.join(project_root, 'data', 'challenge.db')
-    sql_path = os.path.join(project_root, 'data', 'challenge_db_create.sql')
+
+    # load config
+    api_key = config.api.api_key
+    conv_type_id = config.api.conv_type_id
+    base_url = config.api.base_url
+
+    db_path = config.database.db_path
+    sql_path = config.database.sql_path
     
     try:
         # Initialize the journey builder
@@ -229,7 +226,7 @@ def main():
         journeys_df = journey_builder.build_journeys()
         
         # Initialize the IHC Attribution API client
-        client = IHCAttributionClient(api_key, conv_type_id)
+        client = IHCAttributionClient(api_key, conv_type_id, base_url)
         
         # Process and send the journeys to the API in batches
         responses = client.process_journeys(journeys_df, batch_size=200)

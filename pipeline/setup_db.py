@@ -2,6 +2,7 @@ import sqlite3
 import os
 import logging
 import re
+from config import config
 
 logging.basicConfig(
     level=logging.INFO,
@@ -53,8 +54,7 @@ class DatabaseSetup:
             with open(self.sql_path, 'r') as sql_file:
                 sql_script = sql_file.read()
                 clean_script = self.clean_sql_script(sql_script)
-                
-                # Execute each statement separately
+            
                 statements = [stmt.strip() for stmt in clean_script.split(';') if stmt.strip()]
                 for statement in statements:
                     cursor.execute(statement)
@@ -62,7 +62,7 @@ class DatabaseSetup:
             conn.commit()
             logger.info("Database setup completed successfully!")
             
-            # Verify tables
+            # Print Table Info
             self.verify_tables(cursor)
             
             conn.close()
@@ -96,12 +96,9 @@ class DatabaseSetup:
                 logger.warning(f"✗ Table '{table}' not found!")
 
 def main():
-    # Get the absolute path to the project root directory
-    project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-    
-    # Construct paths
-    db_path = os.path.join(project_root, 'data', 'challenge.db')
-    sql_path = os.path.join(project_root, 'data', 'challenge_db_create.sql')
+
+    db_path = config.database.db_path
+    sql_path = config.database.sql_path
     
     # Initialize and run setup
     db_setup = DatabaseSetup(db_path, sql_path)

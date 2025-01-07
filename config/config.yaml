@@ -1,0 +1,20 @@
+api:
+  base_url: "https://api.ihc-attribution.com/v1/compute_ihc"
+  api_key: "17e9cc65-2e46-4345-9210-36860a63f435"
+  conv_type_id: "data_engineering_challenge"
+  batch_size: 200
+  retry_count: 3
+  retry_delay: 5
+  timeout: 30
+
+database:
+  db_name: "challenge.db"
+  sql_name: "challenge_db_create.sql"
+  data_dir: "data"
+
+logging:
+  level: "INFO"
+  format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+
+output:
+  file_path: "output/channel_reporting.csv"
