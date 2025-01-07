@@ -2,7 +2,6 @@ from airflow import DAG
 from airflow.providers.docker.operators.docker import DockerOperator
 from datetime import datetime, timedelta
 
-# Define default arguments
 default_args = {
     'owner': 'airflow',
     'depends_on_past': False,
@@ -31,7 +30,7 @@ volume_config = {
 # Task 1: Database Setup
 setup_db = DockerOperator(
     task_id='setup_database',
-    image='attribution-pipeline',
+    image='attribution_pipeline',
     command='python /app/pipeline/setup_db.py',
     docker_url='unix://var/run/docker.sock',
     network_mode='bridge',
@@ -50,7 +49,7 @@ setup_db = DockerOperator(
 # Task 2: Build Customer Journey
 build_journey = DockerOperator(
     task_id='build_customer_journey',
-    image='attribution-pipeline',
+    image='attribution_pipeline',
     command='python /app/pipeline/build_customer_journey.py',
     docker_url='unix://var/run/docker.sock',
     network_mode='bridge',
@@ -69,7 +68,7 @@ build_journey = DockerOperator(
 # Task 3: Send to API
 send_to_api = DockerOperator(
     task_id='send_to_api',
-    image='attribution-pipeline',
+    image='attribution_pipeline',
     command='python /app/pipeline/send_to_api.py',
     docker_url='unix://var/run/docker.sock',
     network_mode='bridge',
@@ -92,7 +91,7 @@ send_to_api = DockerOperator(
 # Task 4: Process Attribution
 process_attribution = DockerOperator(
     task_id='process_attribution',
-    image='attribution-pipeline',
+    image='attribution_pipeline',
     command='python /app/pipeline/attribution_processor.py',
     docker_url='unix://var/run/docker.sock',
     network_mode='bridge',

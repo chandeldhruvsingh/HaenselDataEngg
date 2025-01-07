@@ -17,8 +17,6 @@ build:
 run:
 	docker run --rm \
 		--name $(CONTAINER_NAME) \
-		-v $(PWD)/data:/app/data \
-		-v $(PWD)/output:/app/output \
 		$(IMAGE_NAME) $(if $(START_DATE),--start_date=$(START_DATE)) $(if $(END_DATE),--end_date=$(END_DATE))
 
 .PHONY: stop
