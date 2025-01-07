@@ -214,6 +214,7 @@ def main():
     api_key = config.api.api_key
     conv_type_id = config.api.conv_type_id
     base_url = config.api.base_url
+    batch_size = config.api.batch_size
 
     db_path = config.database.db_path
     sql_path = config.database.sql_path
@@ -229,7 +230,7 @@ def main():
         client = IHCAttributionClient(api_key, conv_type_id, base_url)
         
         # Process and send the journeys to the API in batches
-        responses = client.process_journeys(journeys_df, batch_size=200)
+        responses = client.process_journeys(journeys_df, batch_size)
         
         # Save API responses to a file
         if responses:

@@ -87,7 +87,11 @@ class CustomerJourneyBuilder:
             with self.get_connection() as conn:
                 # Read query into DataFrame
                 journeys_df = pd.read_sql_query(query, conn)
-                
+
+                if journeys_df.empty:
+                    logger.warning("No customer journeys found in the database. Exiting.")
+                    exit(0)
+                    
                 # Add time difference between session and conversion
                 journeys_df['session_datetime'] = pd.to_datetime(
                     journeys_df['event_date'] + ' ' + journeys_df['event_time']
@@ -166,7 +170,7 @@ def main():
         # Build journeys
         journeys_df = journey_builder.build_journeys()
         
-        # Print Stats
+        # Print Insights in the customer journeys
         stats = journey_builder.get_journey_stats(journeys_df)
         logger.info("\nJourney Statistics:")
         for key, value in stats.items():

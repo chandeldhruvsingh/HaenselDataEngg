@@ -17,7 +17,7 @@ RUN python -m venv /app/venv
 RUN /app/venv/bin/pip install --upgrade pip && \
     /app/venv/bin/pip install -r /app/requirements.txt
 
-# Copy the config directory
+# Copy the relevant directories
 COPY config /app/config/
 COPY pipeline/ /app/pipeline/
 COPY data/ /app/data/
@@ -31,5 +31,5 @@ ENV PATH="/app/venv/bin:$PATH"
 VOLUME /app/data
 VOLUME /app/output
 
-# Run the attribution processor
-CMD ["python", "/app/pipeline/attribution_processor.py"]
+# Set entry point to allow passing runtime arguments to the Python script
+ENTRYPOINT ["python", "/app/pipeline/attribution_processor.py"]

@@ -2,6 +2,8 @@ import pandas as pd
 import sqlite3
 import os
 import logging
+import argparse
+from datetime import datetime
 from pipeline.send_to_api import IHCAttributionClient
 from pipeline.build_customer_journey import CustomerJourneyBuilder
 from typing import List, Dict, Optional
@@ -108,25 +110,56 @@ class AttributionProcessor:
             
             df.to_csv(output_path, index=False)
             logger.info(f"Channel report exported to {output_path}")
+        
+def validate_dates(start_date, end_date):
+    if start_date and end_date:
+        start = datetime.strptime(start_date, "%Y-%m-%d")
+        end = datetime.strptime(end_date, "%Y-%m-%d")
+        if start > end:
+            raise ValueError("Start date cannot be later than end date")
+    return True
+
+def load_config():
+    """
+    Load configuration settings from config file.
+    
+    Returns:
+        tuple: Contains (api_key, conv_type_id, base_url, db_path, sql_path, output_path, batch_size)
+    """
+    return (
+        config.api.api_key,
+        config.api.conv_type_id,
+        config.api.base_url,
+        config.database.db_path,
+        config.database.sql_path,
+        config.output.file_path,
+        config.api.batch_size
+    )
+
 
 def main():
-    #loading config
-    api_key = config.api.api_key
-    conv_type_id = config.api.conv_type_id
-    base_url = config.api.base_url
+    # Parse start and end date if provided
+    parser = argparse.ArgumentParser(description="Attribution Processor with time-range support.")
+    parser.add_argument("--start_date", type=str, help="Start date in YYYY-MM-DD format.")
+    parser.add_argument("--end_date", type=str, help="End date in YYYY-MM-DD format.")
+    args = parser.parse_args()
 
-    db_path = config.database.db_path
-    sql_path = config.database.sql_path
-    output_path = config.output.file_path
-    batch_size = config.api.batch_size
+    #loading config
+    api_key, conv_type_id, base_url, db_path, sql_path, output_path, batch_size = load_config()
     
     try:
+        # Validate dates first
+        try:
+            validate_dates(args.start_date, args.end_date)
+        except ValueError as date_error:
+            logger.error(str(date_error))
+            return
         # Initialize processor
         processor = AttributionProcessor(db_path, api_key, conv_type_id, base_url)
         
         # Get journey data
         journey_builder = CustomerJourneyBuilder(db_path, sql_path)
-        journeys_df = journey_builder.build_journeys()
+        journeys_df = journey_builder.build_journeys(start_date=args.start_date, end_date=args.end_date)
         
         # Process journeys in batches
         formatted_journeys = processor.api_client.format_journey_data(journeys_df)
