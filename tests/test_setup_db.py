@@ -1,12 +1,13 @@
-
 import pytest
 import os
 import sqlite3
 from ..pipeline.setup_db import DatabaseSetup
 
+
 @pytest.fixture
 def test_db_path(tmp_path):
     return str(tmp_path / "test.db")
+
 
 @pytest.fixture
 def test_sql_path(tmp_path):
@@ -55,27 +56,29 @@ def test_sql_path(tmp_path):
     sql_path.write_text(sql_content)
     return str(sql_path)
 
+
 def test_database_setup_successful(test_db_path, test_sql_path):
     db_setup = DatabaseSetup(test_db_path, test_sql_path)
     assert db_setup.setup_database() == True
-    
+
     # Verify tables exist
     conn = sqlite3.connect(test_db_path)
     cursor = conn.cursor()
-    
+
     cursor.execute("SELECT name FROM sqlite_master WHERE type='table'")
     tables = {row[0] for row in cursor.fetchall()}
-    
+
     expected_tables = {
-        'session_sources',
-        'conversions',
-        'session_costs',
-        'attribution_customer_journey',
-        'channel_reporting'
+        "session_sources",
+        "conversions",
+        "session_costs",
+        "attribution_customer_journey",
+        "channel_reporting",
     }
-    
+
     assert tables == expected_tables
     conn.close()
+
 
 def test_database_setup_invalid_sql_path(test_db_path):
     db_setup = DatabaseSetup(test_db_path, "invalid_path.sql")

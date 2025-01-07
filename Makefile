@@ -19,29 +19,17 @@ run:
 		--name $(CONTAINER_NAME) \
 		-v $(PWD)/data:/app/data \
 		-v $(PWD)/output:/app/output \
-		-e API_KEY="$(API_KEY)" \
-		-e CONV_TYPE_ID="$(CONV_TYPE_ID)" \
-		-e OUTPUT_PATH="$(OUTPUT_PATH)" \
-		-e BATCH_SIZE="$(BATCH_SIZE)" \
-		$(IMAGE_NAME)
+		$(IMAGE_NAME) $(if $(START_DATE),--start_date=$(START_DATE)) $(if $(END_DATE),--end_date=$(END_DATE))
 
-# Stop and remove the container (if running)
 .PHONY: stop
 stop:
 	docker stop $(CONTAINER_NAME) || true
 	docker rm $(CONTAINER_NAME) || true
 
-# Clean up the Docker image
 .PHONY: clean
 clean:
 	docker rmi $(IMAGE_NAME) || true
 
-# Format Python code (optional, if you want to include linting)
-.PHONY: format
-format:
-	black pipeline/*.py
-
-# Test Python code (optional, if you have unit tests)
 .PHONY: test
 test:
 	pytest tests/
@@ -50,9 +38,10 @@ test:
 .PHONY: help
 help:
 	@echo "Available commands:"
-	@echo "  make build     - Build the Docker image"
-	@echo "  make run       - Run the Docker container"
-	@echo "  make stop      - Stop and remove the Docker container"
-	@echo "  make clean     - Remove the Docker image"
-	@echo "  make format    - Format Python code with Black"
-	@echo "  make test      - Run unit tests"
+	@echo "  make build                                                        - Build the Docker image"
+	@echo "  make run                                                          - Run the Docker container"
+	@echo "  make run START_DATE=2023-01-07 END_DATE=2023-02-21                - Optionally pass START_DATE and END_DATE for a date range"
+	@echo "  make stop                                                         - Stop and remove the Docker container"
+	@echo "  make clean                                                        - Remove the Docker image"
+	@echo "  make format                                                       - Format Python code with Black"
+	@echo "  make test                                                         - Run unit tests"
