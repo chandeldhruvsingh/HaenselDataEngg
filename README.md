@@ -10,13 +10,11 @@ This project implements a marketing attribution pipeline that processes customer
       ├── output/
       │   └── channel_reporting.csv
       ├── pipeline/
-      │   ├── __init__.py
       │   ├── setup_db.py
       │   ├── build_customer_journey.py
       │   ├── send_to_api.py
       │   └── attribution_processor.py
       ├── tests/
-      │   ├── __init__.py
       │   ├── test_setup_db.py
       │   ├── test_build_customer_journey.py
       │   ├── test_send_to_api.py
