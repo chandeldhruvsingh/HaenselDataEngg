@@ -1,7 +1,8 @@
-import sqlite3
-import os
 import logging
+import os
 import re
+import sqlite3
+
 from config import config
 
 logging.basicConfig(

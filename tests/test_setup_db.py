@@ -1,5 +1,4 @@
 import pytest
-import os
 import sqlite3
 from ..pipeline.setup_db import DatabaseSetup
 

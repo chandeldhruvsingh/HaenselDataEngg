@@ -3,8 +3,7 @@ import pandas as pd
 import sqlite3
 import os
 import logging
-from typing import List, Dict, Optional
-from unittest.mock import Mock, patch
+from typing import Dict
 import shutil
 
 # Set up logging

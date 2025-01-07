@@ -1,11 +1,11 @@
-import requests
-import pandas as pd
-import logging
 import json
-import os
+import logging
 import time
+import pandas as pd
+import requests
+
+from typing import Dict, List, Optional
 from build_customer_journey import CustomerJourneyBuilder
-from typing import List, Dict, Optional
 from config import config
 
 logging.basicConfig(

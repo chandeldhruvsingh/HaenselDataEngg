@@ -1,9 +1,8 @@
+import logging
 import sqlite3
 import pandas as pd
-import logging
-import os
-from typing import Optional, Dict
-from datetime import datetime
+
+from typing import Dict, Optional
 from setup_db import DatabaseSetup
 from config import config
 

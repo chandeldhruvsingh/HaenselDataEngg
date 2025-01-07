@@ -3,7 +3,6 @@ import pandas as pd
 import sqlite3
 import logging
 from typing import Optional, Dict
-from datetime import datetime
 
 # Set up logging
 logging.basicConfig(

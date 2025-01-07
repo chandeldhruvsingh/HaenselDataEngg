@@ -1,14 +1,13 @@
-import pandas as pd
-import sqlite3
-import os
-import logging
 import argparse
-from datetime import datetime
-from pipeline.send_to_api import IHCAttributionClient
-from pipeline.build_customer_journey import CustomerJourneyBuilder
-from typing import List, Dict, Optional
-from config import config
+import logging
+import sqlite3
+import pandas as pd
 
+from datetime import datetime
+from typing import Dict
+from config import config
+from pipeline.build_customer_journey import CustomerJourneyBuilder
+from pipeline.send_to_api import IHCAttributionClient
 
 logging.basicConfig(
     level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"

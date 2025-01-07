@@ -1,8 +1,6 @@
 from airflow import DAG
 from airflow.providers.docker.operators.docker import DockerOperator
-from airflow.operators.python import PythonOperator
 from datetime import datetime, timedelta
-import os
 
 # Define default arguments
 default_args = {

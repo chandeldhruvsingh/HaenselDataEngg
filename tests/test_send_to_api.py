@@ -3,7 +3,6 @@ import pandas as pd
 from unittest.mock import patch, Mock
 import requests
 import logging
-import json
 from typing import List, Dict, Optional
 import time
 
