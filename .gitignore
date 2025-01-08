@@ -1,6 +1,5 @@
 data/challenge.db
 attribution_results.json
-channel_reporting.csv
 airflow/data/challenge.db
 pipeline/test.ipynb
 .DS_Store
