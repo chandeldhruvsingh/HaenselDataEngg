@@ -35,6 +35,10 @@ This project implements a marketing attribution pipeline that processes customer
       ├── Dockerfile
       └── Makefile
 
+## Architecture Diagram
+![ArchitectureDiagram](https://github.com/user-attachments/assets/f90ba33d-20ba-4c45-828e-92c162abb88a)
+
+
 ## Installation
 
 1. Clone the repository:
@@ -79,9 +83,17 @@ make stop
 make clean
 ```
 
-### Run Unit Tests
+## Testing
+
+Run all tests:
 ```bash
 make test
+```
+
+
+Run a specific test file:
+```bash
+pytest tests/test_setup_db.py
 ```
 
 ## Pipeline Components
@@ -101,6 +113,12 @@ make test
 - Handles API communication.
 - Implements retry logic.
 - Processes data in batches.
+
+### 4. Attribution Processor (`attribution_processor.py`)
+- Processes API responses.
+- Updates attribution results.
+- Generates channel reporting.
+- Calculates key metrics (CPO, ROAS).
 
 ## Triggering the Airflow DAGs
 
@@ -129,48 +147,15 @@ To deploy and trigger the Airflow DAGs:
    - Click the play button ▶️ next to the `attribution_pipeline_dag`.
    - Monitor task progress in the Airflow interface.
 
-### 4. Attribution Processor (`attribution_processor.py`)
-- Processes API responses.
-- Updates attribution results.
-- Generates channel reporting.
-- Calculates key metrics (CPO, ROAS).
-
 ## Expected Output
 
 The pipeline generates:
-1. SQLite database with processed data.
+1. SQLite database with processed data in attribution_customer_journey and channel_reporting tables .
 2. Channel reporting CSV file located in the `output/` directory containing:
    - Channel performance metrics.
    - Cost per Order (CPO).
    - Return on Ad Spend (ROAS).
 
-### Output Tables Schema
-1. **attribution_customer_journey**
-   - `conv_id`
-   - `session_id`
-   - `ihc`
-
-2. **channel_reporting**
-   - `channel_name`
-   - `date`
-   - `cost`
-   - `ihc`
-   - `ihc_revenue`
-   - `CPO`
-   - `ROAS`
-
-## Testing
-
-Run all tests:
-```bash
-make test
-```
-
-
-Run a specific test file:
-```bash
-pytest tests/test_setup_db.py
-```
 
 ## Contributing
 
