@@ -1,6 +1,6 @@
 api:
   base_url: "https://api.ihc-attribution.com/v1/compute_ihc"
-  api_key: "90efcd82-8d01-4c80-9d18-7ad2b8a98cf6"
+  api_key: "e9395de1-826b-43c9-a551-32dd6f690258"
   conv_type_id: "data_engineering_challenge"
   batch_size: 200
   retry_count: 3

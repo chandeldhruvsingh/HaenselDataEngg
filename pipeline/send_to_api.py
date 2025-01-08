@@ -48,59 +48,32 @@ class IHCAttributionClient:
         df_sorted = df.sort_values(["conv_id", "event_date", "event_time"])
 
         formatted_journeys = []
-        current_conversion = None
-        current_sessions = []
 
-        for _, row in df_sorted.iterrows():
-            # If we've moved to a new conversion
-            if current_conversion != row["conv_id"]:
-                # Save the previous conversion if it exists
-                if current_conversion and current_sessions:
-                    journey = {
-                        "conversion_id": str(current_conversion),
-                        "session_id": current_sessions[0]["session_id"],
-                        "timestamp": current_sessions[0]["timestamp"],
-                        "channel_label": current_sessions[0]["channel_label"],
-                        "holder_engagement": current_sessions[0]["holder_engagement"],
-                        "closer_engagement": current_sessions[0]["closer_engagement"],
-                        "conversion": 1
-                        if current_sessions[-1]["closer_engagement"]
-                        else 0,
-                        "impression_interaction": current_sessions[0][
-                            "impression_interaction"
-                        ],
-                    }
-                    formatted_journeys.append(journey)
+        for conversion_id, group in df_sorted.groupby("conv_id"):
+            # Process each group of sessions for the same conversion ID
+            sessions = []
+            for _, row in group.iterrows():
+                session = {
+                    "conversion_id": str(row["conv_id"]),
+                    "session_id": str(row["session_id"]),
+                    "timestamp": f"{row['event_date']} {row['event_time']}",
+                    "channel_label": str(row["channel_name"]),
+                    "holder_engagement": int(row["holder_engagement"]),
+                    "closer_engagement": int(row["closer_engagement"]),
+                    "conversion": 0,  # Default to 0; updated for the last session
+                    "impression_interaction": int(row["impression_interaction"]),
+                }
+                sessions.append(session)
 
-                current_conversion = row["conv_id"]
-                current_sessions = []
+            # Mark the last session's "conversion" as 1
+            if sessions:
+                sessions[-1]["conversion"] = 1
 
-            # Format the session data
-            session = {
-                "session_id": str(row["session_id"]),
-                "timestamp": f"{row['event_date']} {row['event_time']}",
-                "channel_label": str(row["channel_name"]),
-                "holder_engagement": bool(row["holder_engagement"]),
-                "closer_engagement": bool(row["closer_engagement"]),
-                "impression_interaction": bool(row["impression_interaction"]),
-            }
-            current_sessions.append(session)
-
-        # Add the last conversion
-        if current_conversion and current_sessions:
-            journey = {
-                "conversion_id": str(current_conversion),
-                "session_id": current_sessions[0]["session_id"],
-                "timestamp": current_sessions[0]["timestamp"],
-                "channel_label": current_sessions[0]["channel_label"],
-                "holder_engagement": current_sessions[0]["holder_engagement"],
-                "closer_engagement": current_sessions[0]["closer_engagement"],
-                "conversion": 1 if current_sessions[-1]["closer_engagement"] else 0,
-                "impression_interaction": current_sessions[0]["impression_interaction"],
-            }
-            formatted_journeys.append(journey)
+            # Append all sessions to the formatted journeys
+            formatted_journeys.extend(sessions)
 
         return formatted_journeys
+
 
     def send_to_api(
         self, journeys: List[Dict], retry_count: int = 1, retry_delay: int = 5
